@@ -1,0 +1,2 @@
+
+rk3399-nanopi4-rkisp1.dtsi    kernel\arch\arm64\boot\dts\rockchip
