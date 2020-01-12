@@ -40,6 +40,7 @@
 #define VEYE327_REG_CHIP_ID		0x0001
 //start streaming and stop streaming
 #define VEYE327_REG_CTRL_MODE		0x000B
+
 #define VEYE327_MODE_SW_STANDBY		0x0
 #define VEYE327_MODE_STREAMING		0x1
 
@@ -494,6 +495,8 @@ static int __veye327_start_stream(struct veye327 *veye327)
 
 	return veye327_write_reg(veye327->client, VEYE327_REG_CTRL_MODE,
 				VEYE327_REG_VALUE_08BIT, VEYE327_MODE_STREAMING);
+
+
 }
 
 static int __veye327_stop_stream(struct veye327 *veye327)
@@ -526,14 +529,15 @@ static int veye327_s_stream(struct v4l2_subdev *sd, int on)
 			pm_runtime_put(&client->dev);
 			goto unlock_and_return;
 		}
+        dev_info(dev, "veye327_s_stream  start\n");
         //wait for stream
-        msleep(40);
+        //msleep(40);
 	} else {
 		__veye327_stop_stream(veye327);
+        dev_info(dev, "veye327_s_stream  stop\n");
 		pm_runtime_put(&client->dev);
 	}
 
-    dev_info(dev, "veye327_s_stream \n");
 	veye327->streaming = on;
 
 unlock_and_return:
@@ -1021,7 +1025,9 @@ static int veye327_probe(struct i2c_client *client,
 			 veye327->module_index, facing,
 			 VEYE327_NAME, dev_name(sd->dev));
 	}
-
+    
+    veye327_write_reg(veye327->client, VEYE327_REG_CTRL_MODE,
+				VEYE327_REG_VALUE_08BIT, VEYE327_MODE_SW_STANDBY);
 	ret = v4l2_async_register_subdev_sensor_common(sd);
 	if (ret) {
 		dev_err(dev, "v4l2 async register subdev failed\n");
