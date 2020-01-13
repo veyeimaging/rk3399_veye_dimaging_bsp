@@ -1,0 +1,103 @@
+/*
+ * Copyright (c) 2018 Tianjin DataImaging Tech. Co., Ltd
+ * (http://www.veye.cc)
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, you can access it online at
+ * http://www.gnu.org/licenses/gpl-2.0.html.
+ */
+
+#if defined(VEYE_RK_RK_ISP1)
+
+&cif_isp0 {
+	status = "disabled";
+};
+
+&cif_isp1 {
+	status = "disabled";
+};
+
+&i2c6 {
+    status = "okay";
+	veye327p0: veye327@3b {
+		compatible = "veye,veye327";
+		status = "okay";
+		reg = <0x3b>;
+		clocks = <&cru SCLK_CIF_OUT>;
+		clock-names = "xvclk";
+
+		reset-gpios = <&gpio2 4 GPIO_ACTIVE_HIGH>;
+		pwdn-gpios = <&gpio2 5 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "rockchip,camera_default", "rockchip,camera_sleep";
+		pinctrl-0 = <&cam0_default_pins>;
+		pinctrl-1 = <&cam0_default_pins>;
+
+		port {
+			ucam_out0a: endpoint {
+				remote-endpoint = <&mipi_in_ucam0a>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+};
+
+&rkisp1_0 {
+	status = "okay";
+
+	port {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		isp0_mipi_in: endpoint@0 {
+			reg = <0>;
+			remote-endpoint = <&dphy_rx0_out>;
+		};
+	};
+};
+
+&isp0_mmu {
+	status = "okay";
+};
+
+&mipi_dphy_rx0 {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+            mipi_in_ucam0a: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&ucam_out0a>;
+				data-lanes = <1 2>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			dphy_rx0_out: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&isp0_mipi_in>;
+			};
+		};
+	};
+};
+
+#endif /* VEYE_RK_RK_ISP1 */
